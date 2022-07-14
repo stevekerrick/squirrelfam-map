@@ -4,6 +4,7 @@ export default {
       name: "Acacia",
       type: "home",
       nether: [-160, 59, -168],
+      images: ["acacia01.png", "acacia02.png", "acacia03.png"]
     },
     {
       name: "Jungle",

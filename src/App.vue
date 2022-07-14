@@ -20,6 +20,9 @@
       <div v-if="showDetails" class="coordinates">
         {{ coordinates(location) }}
       </div>
+      <div v-if="showDetails && location.images">
+        <a @click="showLocation(location)">images</a>
+      </div>
     </div>
     <div
       v-for="(horizontalPath, index) in horizontalPaths"
@@ -37,14 +40,31 @@
     >
       <div class="vertical-path"></div>
     </div>
+
+    <Dialog
+      v-model:visible="showDialog"
+      :modal="true"
+      :dismissableMask="true"
+      :showHeader="false"
+    >
+      <Carousel :value="selectedLocation.images">
+        <template #item="slotProps">
+          <img :src="`/images/${slotProps.data}`" />
+        </template>
+      </Carousel>
+    </Dialog>
   </div>
 </template>
 
 <script>
 import MapData from "./mapData.js";
+import Carousel from "primevue/carousel";
+import Dialog from "primevue/dialog";
 
 export default {
   name: "App",
+
+  components: { Carousel, Dialog },
 
   data() {
     return {
@@ -66,6 +86,9 @@ export default {
       panY: 0,
 
       isMouseDown: false,
+
+      selectedLocation: null,
+      showDialog: false,
     };
   },
 
@@ -198,6 +221,11 @@ export default {
       return `(${location.nether[0] * 8},, ${location.nether[2] * 8})`;
     },
 
+    showLocation(location) {
+      this.selectedLocation = location;
+      this.showDialog = true;
+    },
+
     onWheel(e) {
       var factor = e.deltaY > 22 ? 1 / 1.1 : e.deltaY < -22 ? 1.1 : 1;
       if (factor === 1) return;
@@ -263,6 +291,19 @@ export default {
   padding: 0.5em;
   z-index: 10;
   background-color: #1b2430;
+  cursor: default;
+}
+
+a {
+  font-size: smaller;
+  text-decoration: underline;
+  color: rgba(214, 213, 168, 0.8);
+}
+a:hover {
+  cursor: pointer;
+}
+img {
+  max-width: 60%;
 }
 
 .coordinates {
