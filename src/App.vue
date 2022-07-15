@@ -24,6 +24,7 @@
         <a @click="showLocation(location)">images</a>
       </div>
     </div>
+
     <div
       v-for="(horizontalPath, index) in horizontalPaths"
       :key="index"
@@ -32,6 +33,7 @@
     >
       <div class="horizontal-path"></div>
     </div>
+
     <div
       v-for="(verticalPath, index) in verticalPaths"
       :key="index"
@@ -40,6 +42,28 @@
     >
       <div class="vertical-path"></div>
     </div>
+
+    <template v-for="tick in horizontalTicks" :key="tick.label">
+      <div class="horizontal-tick" :style="{ left: `${tick.left}px` }"></div>
+      <div
+        v-if="tick.label"
+        class="horizontal-tick-label"
+        :style="{ left: `calc(${tick.left}px - 2em)` }"
+      >
+        {{ tick.label }}
+      </div>
+    </template>
+
+    <template v-for="tick in verticalTicks" :key="tick.label">
+      <div class="vertical-tick" :style="{ top: `${tick.top}px` }"></div>
+      <div
+        v-if="tick.label"
+        class="vertical-tick-label"
+        :style="{ top: `calc(${tick.top}px - .6em)` }"
+      >
+        {{ tick.label }}
+      </div>
+    </template>
 
     <Dialog
       v-model:visible="showDialog"
@@ -98,6 +122,46 @@ export default {
     },
     showDetails() {
       return this.scale * this.zoom > 0.14;
+    },
+    horizontalTicks() {
+      var ticks = [];
+      var thousands = Math.floor(
+        (-this.panX / this.scale / this.zoom + this.mapX0) / 1000
+      );
+      var x = 0;
+
+      while (x < this.windowWidth) {
+        x = this.toScale(thousands * 1000, this.mapX0, this.panX);
+        var label = this.scale * this.zoom > 0.02 ? thousands.toString() : null;
+        ticks.push({
+          left: x,
+          label: label,
+        });
+
+        thousands++;
+      }
+
+      return ticks;
+    },
+    verticalTicks() {
+      var ticks = [];
+      var thousands = Math.floor(
+        (-this.panY / this.scale / this.zoom + this.mapY0) / 1000
+      );
+      var y = 0;
+
+      while (y < this.windowHeight) {
+        y = this.toScale(thousands * 1000, this.mapY0, this.panY);
+        var label = this.scale * this.zoom > 0.02 ? thousands.toString() : null;
+        ticks.push({
+          top: y,
+          label: label,
+        });
+
+        thousands++;
+      }
+
+      return ticks;
     },
   },
 
@@ -317,9 +381,37 @@ img {
   border-top: 2px dashed #51557e;
 }
 
+.horizontal-tick {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 0.5em;
+  border-left: 1px solid #51557e;
+}
+.horizontal-tick-label {
+  position: absolute;
+  top: 0.7em;
+  width: 4em;
+  text-align: center;
+  font-size: small;
+  color: rgba(214, 213, 168, 0.5);
+}
 .vertical-path {
   position: absolute;
   border-left: 2px dashed #51557e;
+}
+.vertical-tick {
+  position: absolute;
+  left: 0;
+  width: 0.5em;
+  height: 0;
+  border-top: 1px solid #51557e;
+}
+.vertical-tick-label {
+  position: absolute;
+  left: 0.9em;
+  font-size: small;
+  color: rgba(214, 213, 168, 0.5);
 }
 
 .mouse-up {
