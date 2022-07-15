@@ -73,7 +73,7 @@
     >
       <Carousel :value="selectedLocation.images">
         <template #item="slotProps">
-          <img :src="`/images/${slotProps.data}`" />
+          <img :src="`images/${slotProps.data}`" />
         </template>
       </Carousel>
     </Dialog>
