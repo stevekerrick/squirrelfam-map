@@ -134,9 +134,7 @@ export default {
     },
     horizontalTicks() {
       var ticks = [];
-      var thousands = Math.floor(
-        this.screenCoordinateToMapCoordinate(0, this.mapX0, this.panX) / 1000
-      );
+      var thousands = Math.floor(this.mapX(0) / 1000);
       var x = 0;
 
       while (x < this.windowWidth) {
@@ -154,9 +152,7 @@ export default {
     },
     verticalTicks() {
       var ticks = [];
-      var thousands = Math.floor(
-        this.screenCoordinateToMapCoordinate(0, this.mapY0, this.panY) / 1000
-      );
+      var thousands = Math.floor(this.mapY(0) / 1000);
       var y = 0;
 
       while (y < this.windowHeight) {
@@ -327,16 +323,8 @@ export default {
 
       // We want the center not to move.
       // Calculate the map point that is in the center now.
-      var centerX = this.screenCoordinateToMapCoordinate(
-        this.windowWidth / 2,
-        this.mapX0,
-        this.panX
-      );
-      var centerY = this.screenCoordinateToMapCoordinate(
-        this.windowHeight / 2,
-        this.mapY0,
-        this.panY
-      );
+      var centerX = this.mapX(this.windowWidth / 2);
+      var centerY = this.mapY(this.windowHeight / 2);
 
       this.zoom = this.zoom * factor;
       //console.log("scale * zoom", this.scale * this.zoom);
@@ -368,12 +356,8 @@ export default {
       }
 
       if (this.isMouseEnter) {
-        this.mouseX = Math.floor(
-          this.screenCoordinateToMapCoordinate(e.pageX, this.mapX0, this.panX)
-        );
-        this.mouseY = Math.floor(
-          this.screenCoordinateToMapCoordinate(e.pageY, this.mapY0, this.panY)
-        );
+        this.mouseX = Math.floor(this.mapX(e.pageX));
+        this.mouseY = Math.floor(this.mapY(e.pageY));
       }
     },
   },
