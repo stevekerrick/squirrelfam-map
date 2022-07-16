@@ -33,12 +33,13 @@ export default {
     },
     {
       name: "Michelle's",
-      type: "portal",
+      type: "village",
       nether: [-17, 60, -168],
+      images: ["michelle01.png", "michelle02.png", "michelle03.png"]
     },
     {
       name: "Dorginton",
-      type: "portal",
+      type: "village",
       nether: [-299, 90, -234],
     },
     {
@@ -51,6 +52,12 @@ export default {
       type: "portal",
       nether: [1204, 59, 953],
     },
+    {
+      name: "Stronghold",
+      type: "stronghold",
+      nether: [-181, 70, 120],
+      images: ["stronghold01.png", "stronghold02.png", "stronghold03.png", "stronghold04.png"]
+    }
   ],
 
   paths: [
@@ -72,5 +79,7 @@ export default {
     [-160, -168, -160, 953],
     // Two Castles to Mansion 1
     [-160, 953, 1204, 953],
+    // Casey to Stronghold
+    [38, -39, -181, -39, -181, 120]
   ]
 }

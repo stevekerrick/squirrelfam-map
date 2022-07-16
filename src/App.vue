@@ -6,6 +6,8 @@
     @wheel="onWheel"
     @mousedown="onMouseDown"
     @mouseup="onMouseUp"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
     @mousemove="onMouseMove"
     v-cloak
   >
@@ -65,6 +67,10 @@
       </div>
     </template>
 
+    <div v-if="isMouseEnter" class="mouse-position">
+      ({{ mouseX }},, {{ mouseY }})
+    </div>
+
     <Dialog
       v-model:visible="showDialog"
       :modal="true"
@@ -110,6 +116,9 @@ export default {
       panY: 0,
 
       isMouseDown: false,
+      isMouseEnter: false,
+      mouseX: 0,
+      mouseY: 0,
 
       selectedLocation: null,
       showDialog: false,
@@ -126,12 +135,16 @@ export default {
     horizontalTicks() {
       var ticks = [];
       var thousands = Math.floor(
-        (-this.panX / this.scale / this.zoom + this.mapX0) / 1000
+        this.screenCoordinateToMapCoordinate(0, this.mapX0, this.panX) / 1000
       );
       var x = 0;
 
       while (x < this.windowWidth) {
-        x = this.toScale(thousands * 1000, this.mapX0, this.panX);
+        x = this.mapCoordinateToScreenCoordinate(
+          thousands * 1000,
+          this.mapX0,
+          this.panX
+        );
         var label = this.scale * this.zoom > 0.02 ? thousands.toString() : null;
         ticks.push({
           left: x,
@@ -146,12 +159,16 @@ export default {
     verticalTicks() {
       var ticks = [];
       var thousands = Math.floor(
-        (-this.panY / this.scale / this.zoom + this.mapY0) / 1000
+        this.screenCoordinateToMapCoordinate(0, this.mapY0, this.panY) / 1000
       );
       var y = 0;
 
       while (y < this.windowHeight) {
-        y = this.toScale(thousands * 1000, this.mapY0, this.panY);
+        y = this.mapCoordinateToScreenCoordinate(
+          thousands * 1000,
+          this.mapY0,
+          this.panY
+        );
         var label = this.scale * this.zoom > 0.02 ? thousands.toString() : null;
         ticks.push({
           top: y,
@@ -249,8 +266,16 @@ export default {
       }, this);
     },
     locStyle(location) {
-      var left = this.toScale(location.nether[0] * 8, this.mapX0, this.panX);
-      var top = this.toScale(location.nether[2] * 8, this.mapY0, this.panY);
+      var left = this.mapCoordinateToScreenCoordinate(
+        location.nether[0] * 8,
+        this.mapX0,
+        this.panX
+      );
+      var top = this.mapCoordinateToScreenCoordinate(
+        location.nether[2] * 8,
+        this.mapY0,
+        this.panY
+      );
 
       return {
         left: `${left - 25}px`,
@@ -259,26 +284,49 @@ export default {
     },
     horizontalPathStyle(path) {
       return {
-        left: `${this.toScale(path.x, this.mapX0, this.panX)}px`,
-        top: `${this.toScale(path.y, this.mapY0, this.panY)}px`,
+        left: `${this.mapCoordinateToScreenCoordinate(
+          path.x,
+          this.mapX0,
+          this.panX
+        )}px`,
+        top: `${this.mapCoordinateToScreenCoordinate(
+          path.y,
+          this.mapY0,
+          this.panY
+        )}px`,
         width: `${path.length * this.scale * this.zoom}px`,
       };
     },
     verticalPathStyle(path) {
       return {
-        left: `${this.toScale(path.x, this.mapX0, this.panX)}px`,
-        top: `${this.toScale(path.y, this.mapY0, this.panY)}px`,
+        left: `${this.mapCoordinateToScreenCoordinate(
+          path.x,
+          this.mapX0,
+          this.panX
+        )}px`,
+        top: `${this.mapCoordinateToScreenCoordinate(
+          path.y,
+          this.mapY0,
+          this.panY
+        )}px`,
         height: `${path.length * this.scale * this.zoom}px`,
       };
     },
-    toScale(raw, map0, pan) {
+    mapCoordinateToScreenCoordinate(raw, map0, pan) {
       return (raw - map0) * this.scale * this.zoom + pan;
+    },
+    screenCoordinateToMapCoordinate(raw, map0, pan) {
+      return (raw - pan) / this.scale / this.zoom + map0;
     },
     locationIcon(type) {
       return type === "home"
         ? "fa-solid fa-house"
         : type === "portal"
         ? "fa-solid fa-dungeon"
+        : type === "stronghold"
+        ? "fa-solid fa-chess-rook"
+        : type === "village"
+        ? "fa-solid fa-campground"
         : "fa-solid fa-location-pin";
     },
     coordinates(location) {
@@ -296,19 +344,27 @@ export default {
 
       // We want the center not to move.
       // Calculate the map point that is in the center now.
-      var centerX =
-        (this.windowWidth / 2 - this.panX) / this.scale / this.zoom +
-        this.mapX0;
-      var centerY =
-        (this.windowHeight / 2 - this.panY) / this.scale / this.zoom +
-        this.mapY0;
+      var centerX = this.screenCoordinateToMapCoordinate(
+        this.windowWidth / 2,
+        this.mapX0,
+        this.panX
+      );
+      var centerY = this.screenCoordinateToMapCoordinate(
+        this.windowHeight / 2,
+        this.mapY0,
+        this.panY
+      );
 
       this.zoom = this.zoom * factor;
       //console.log("scale * zoom", this.scale * this.zoom);
 
       // Change the Pan so the center point is back in the center
-      this.panX = this.windowWidth / 2 - this.toScale(centerX, this.mapX0, 0);
-      this.panY = this.windowHeight / 2 - this.toScale(centerY, this.mapY0, 0);
+      this.panX =
+        this.windowWidth / 2 -
+        this.mapCoordinateToScreenCoordinate(centerX, this.mapX0, 0);
+      this.panY =
+        this.windowHeight / 2 -
+        this.mapCoordinateToScreenCoordinate(centerY, this.mapY0, 0);
     },
     onMouseDown() {
       this.isMouseDown = true;
@@ -316,11 +372,26 @@ export default {
     onMouseUp() {
       this.isMouseDown = false;
     },
+    onMouseEnter() {
+      this.isMouseEnter = true;
+    },
+    onMouseLeave() {
+      this.isMouseEnter = false;
+    },
     onMouseMove(e) {
-      if (!this.isMouseDown) return true;
+      if (this.isMouseDown) {
+        this.panX = this.panX + e.movementX;
+        this.panY = this.panY + e.movementY;
+      }
 
-      this.panX = this.panX + e.movementX;
-      this.panY = this.panY + e.movementY;
+      if (this.isMouseEnter) {
+        this.mouseX = Math.floor(
+          this.screenCoordinateToMapCoordinate(e.pageX, this.mapX0, this.panX)
+        );
+        this.mouseY = Math.floor(
+          this.screenCoordinateToMapCoordinate(e.pageY, this.mapY0, this.panY)
+        );
+      }
     },
   },
 
@@ -420,5 +491,14 @@ img {
 
 .mouse-down {
   cursor: grabbing;
+}
+.mouse-position {
+  position: absolute;
+  font-size: small;
+  text-align: right;
+  color: rgba(214, 213, 168, 0.5);
+  top: calc(100vh - 2rem);
+  left: calc(100vw - 10rem);
+  width: 9rem;
 }
 </style>
