@@ -57,7 +57,12 @@ export default {
       type: "stronghold",
       nether: [-181, 70, 120],
       images: ["stronghold01.png", "stronghold02.png", "stronghold03.png", "stronghold04.png"]
-    }
+    },
+    // {
+    //   name: "Mangrove",
+    //   type: "point",
+    //   overworld: [-4075, 64, -905544622]
+    // }
   ],
 
   paths: [

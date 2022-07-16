@@ -140,11 +140,7 @@ export default {
       var x = 0;
 
       while (x < this.windowWidth) {
-        x = this.mapCoordinateToScreenCoordinate(
-          thousands * 1000,
-          this.mapX0,
-          this.panX
-        );
+        x = this.screenX(thousands * 1000);
         var label = this.scale * this.zoom > 0.02 ? thousands.toString() : null;
         ticks.push({
           left: x,
@@ -164,11 +160,7 @@ export default {
       var y = 0;
 
       while (y < this.windowHeight) {
-        y = this.mapCoordinateToScreenCoordinate(
-          thousands * 1000,
-          this.mapY0,
-          this.panY
-        );
+        y = this.screenY(thousands * 1000);
         var label = this.scale * this.zoom > 0.02 ? thousands.toString() : null;
         ticks.push({
           top: y,
@@ -266,16 +258,8 @@ export default {
       }, this);
     },
     locStyle(location) {
-      var left = this.mapCoordinateToScreenCoordinate(
-        location.nether[0] * 8,
-        this.mapX0,
-        this.panX
-      );
-      var top = this.mapCoordinateToScreenCoordinate(
-        location.nether[2] * 8,
-        this.mapY0,
-        this.panY
-      );
+      var left = this.screenX(location.nether[0] * 8);
+      var top = this.screenY(location.nether[2] * 8);
 
       return {
         left: `${left - 25}px`,
@@ -284,40 +268,39 @@ export default {
     },
     horizontalPathStyle(path) {
       return {
-        left: `${this.mapCoordinateToScreenCoordinate(
-          path.x,
-          this.mapX0,
-          this.panX
-        )}px`,
-        top: `${this.mapCoordinateToScreenCoordinate(
-          path.y,
-          this.mapY0,
-          this.panY
-        )}px`,
+        left: `${this.screenX(path.x)}px`,
+        top: `${this.screenY(path.y)}px`,
         width: `${path.length * this.scale * this.zoom}px`,
       };
     },
     verticalPathStyle(path) {
       return {
-        left: `${this.mapCoordinateToScreenCoordinate(
-          path.x,
-          this.mapX0,
-          this.panX
-        )}px`,
-        top: `${this.mapCoordinateToScreenCoordinate(
-          path.y,
-          this.mapY0,
-          this.panY
-        )}px`,
+        left: `${this.screenX(path.x)}px`,
+        top: `${this.screenY(path.y)}px`,
         height: `${path.length * this.scale * this.zoom}px`,
       };
+    },
+
+    screenX(raw) {
+      return this.mapCoordinateToScreenCoordinate(raw, this.mapX0, this.panX);
+    },
+    screenY(raw) {
+      return this.mapCoordinateToScreenCoordinate(raw, this.mapY0, this.panY);
     },
     mapCoordinateToScreenCoordinate(raw, map0, pan) {
       return (raw - map0) * this.scale * this.zoom + pan;
     },
+
+    mapX(raw) {
+      return this.screenCoordinateToMapCoordinate(raw, this.mapX0, this.panX);
+    },
+    mapY(raw) {
+      return this.screenCoordinateToMapCoordinate(raw, this.mapY0, this.panY);
+    },
     screenCoordinateToMapCoordinate(raw, map0, pan) {
       return (raw - pan) / this.scale / this.zoom + map0;
     },
+
     locationIcon(type) {
       return type === "home"
         ? "fa-solid fa-house"
