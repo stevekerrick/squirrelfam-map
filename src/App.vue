@@ -177,23 +177,18 @@ export default {
       this.isloaded = true;
     },
     setInitialMapValues() {
-      var x0 = this.locations[0].nether[0];
-      var x1 = this.locations[0].nether[0];
-      var y0 = this.locations[0].nether[2];
-      var y1 = this.locations[0].nether[2];
+      var x0 = this.locationX(this.locations[0]);
+      var x1 = x0;
+      var y0 = this.locationY(this.locations[0]);
+      var y1 = y0;
 
       for (var i = 1; i < this.locations.length; i++) {
         var loc = this.locations[i];
-        x0 = Math.min(x0, loc.nether[0]);
-        x1 = Math.max(x1, loc.nether[0]);
-        y0 = Math.min(y0, loc.nether[2]);
-        y1 = Math.max(y1, loc.nether[2]);
+        x0 = Math.min(x0, this.locationX(loc));
+        x1 = Math.max(x1, this.locationX(loc));
+        y0 = Math.min(y0, this.locationY(loc));
+        y1 = Math.max(y1, this.locationY(loc));
       }
-
-      x0 *= 8;
-      x1 *= 8;
-      y0 *= 8;
-      y1 *= 8;
 
       var width = x1 - x0;
       var height = y1 - y0;
@@ -229,6 +224,12 @@ export default {
         this.windowHeight / this.mapHeight
       );
     },
+    locationX(loc) {
+      return loc.overworld ? loc.overworld[0] : loc.nether[0] * 8;
+    },
+    locationY(loc) {
+      return loc.overworld ? loc.overworld[2] : loc.nether[2] * 8;
+    },
     setNetherPaths() {
       MapData.paths.forEach((p) => {
         for (var i = 2; i < p.length; i += 2) {
@@ -254,8 +255,8 @@ export default {
       }, this);
     },
     locStyle(location) {
-      var left = this.screenX(location.nether[0] * 8);
-      var top = this.screenY(location.nether[2] * 8);
+      var left = this.screenX(this.locationX(location));
+      var top = this.screenY(this.locationY(location));
 
       return {
         left: `${left - 25}px`,
@@ -309,7 +310,7 @@ export default {
         : "fa-solid fa-location-pin";
     },
     coordinates(location) {
-      return `(${location.nether[0] * 8},, ${location.nether[2] * 8})`;
+      return `(${this.locationX(location)},, ${this.locationY(location)})`;
     },
 
     showLocation(location) {
