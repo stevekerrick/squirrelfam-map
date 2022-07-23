@@ -74,6 +74,8 @@ export default {
     [-347, -337, -611, -337],
     // Flower Mine to Ice Spikes
     [-612, -339, -612, 340],
+    // Flower Mine to Mangrove
+    [-612, -113, -509, -113],
     // Casey to Michelle
     [38, -39, 38, -168, -17, -168],
     // Michelle to Acacia

@@ -11,22 +11,34 @@
     @mousemove="onMouseMove"
     v-cloak
   >
+    <!-- Locations -->
     <div
       v-for="location in locations"
       :key="location.name"
-      class="loc"
+      :class="{'loc': true, 'highlighted': highlightedLocation === location}"
       :style="locStyle(location)"
+      @click="onLocationClick(location)"
     >
       <i :class="locationIcon(location.type)"></i>
-      <span v-if="showDetails">&nbsp;{{ location.name }}</span>
-      <div v-if="showDetails" class="coordinates">
+      <span v-if="showDetails || highlightedLocation === location"
+        >&nbsp;{{ location.name }}</span
+      >
+      <div
+        v-if="showDetails || highlightedLocation === location"
+        class="coordinates"
+      >
         {{ coordinates(location) }}
       </div>
-      <div v-if="showDetails && location.images">
-        <a @click="showLocation(location)">images</a>
+      <div
+        v-if="
+          (showDetails || highlightedLocation === location) && location.images
+        "
+      >
+        <a @click="showImages(location, $event)">images</a>
       </div>
     </div>
 
+    <!-- Horizontal paths -->
     <div
       v-for="(horizontalPath, index) in horizontalPaths"
       :key="index"
@@ -36,6 +48,7 @@
       <div class="horizontal-path"></div>
     </div>
 
+    <!-- Vertical paths -->
     <div
       v-for="(verticalPath, index) in verticalPaths"
       :key="index"
@@ -67,17 +80,19 @@
       </div>
     </template>
 
+    <!-- Mouse position -->
     <div v-if="isMouseEnter" class="mouse-position">
       ({{ mouseX }},, {{ mouseY }})
     </div>
 
+    <!-- Image carousel -->
     <Dialog
       v-model:visible="showDialog"
       :modal="true"
       :dismissableMask="true"
       :showHeader="false"
     >
-      <Carousel :value="selectedLocation.images">
+      <Carousel :value="imageLocation.images">
         <template #item="slotProps">
           <img :src="`images/${slotProps.data}`" />
         </template>
@@ -120,8 +135,9 @@ export default {
       mouseX: 0,
       mouseY: 0,
 
-      selectedLocation: null,
+      imageLocation: null,
       showDialog: false,
+      highlightedLocation: null
     };
   },
 
@@ -142,7 +158,7 @@ export default {
         var label = this.scale * this.zoom > 0.02 ? thousands.toString() : null;
         ticks.push({
           left: x,
-          label: label,
+          label: label
         });
 
         thousands++;
@@ -160,14 +176,14 @@ export default {
         var label = this.scale * this.zoom > 0.02 ? thousands.toString() : null;
         ticks.push({
           top: y,
-          label: label,
+          label: label
         });
 
         thousands++;
       }
 
       return ticks;
-    },
+    }
   },
 
   methods: {
@@ -231,7 +247,7 @@ export default {
       return loc.overworld ? loc.overworld[2] : loc.nether[2] * 8;
     },
     setNetherPaths() {
-      MapData.paths.forEach((p) => {
+      MapData.paths.forEach(p => {
         for (var i = 2; i < p.length; i += 2) {
           var x0 = p[i - 2] * 8;
           var y0 = p[i - 1] * 8;
@@ -242,13 +258,13 @@ export default {
             this.verticalPaths.push({
               x: x0,
               y: Math.min(y0, y1),
-              length: Math.abs(y1 - y0),
+              length: Math.abs(y1 - y0)
             });
           } else {
             this.horizontalPaths.push({
               y: y0,
               x: Math.min(x0, x1),
-              length: Math.abs(x1 - x0),
+              length: Math.abs(x1 - x0)
             });
           }
         }
@@ -260,21 +276,21 @@ export default {
 
       return {
         left: `${left - 25}px`,
-        top: `${top - 25}px`,
+        top: `${top - 25}px`
       };
     },
     horizontalPathStyle(path) {
       return {
         left: `${this.screenX(path.x)}px`,
         top: `${this.screenY(path.y)}px`,
-        width: `${path.length * this.scale * this.zoom}px`,
+        width: `${path.length * this.scale * this.zoom}px`
       };
     },
     verticalPathStyle(path) {
       return {
         left: `${this.screenX(path.x)}px`,
         top: `${this.screenY(path.y)}px`,
-        height: `${path.length * this.scale * this.zoom}px`,
+        height: `${path.length * this.scale * this.zoom}px`
       };
     },
 
@@ -313,8 +329,9 @@ export default {
       return `(${this.locationX(location)},, ${this.locationY(location)})`;
     },
 
-    showLocation(location) {
-      this.selectedLocation = location;
+    showImages(location, e) {
+      e.stopPropagation();
+      this.imageLocation = location;
       this.showDialog = true;
     },
 
@@ -361,11 +378,18 @@ export default {
         this.mouseY = Math.floor(this.mapY(e.pageY));
       }
     },
+    onLocationClick(location) {
+      if (this.highlightedLocation === location) {
+        this.highlightedLocation = null;
+      } else {
+        this.highlightedLocation = location;
+      }
+    }
   },
 
   mounted() {
     this.load();
-  },
+  }
 };
 </script>
 
@@ -394,7 +418,10 @@ export default {
   padding: 0.5em;
   z-index: 10;
   background-color: #1b2430;
-  cursor: default;
+  cursor: pointer;
+}
+.loc.highlighted {
+  z-index: 20;
 }
 
 a {
