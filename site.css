@@ -1,0 +1,19 @@
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  font-family: Verdana, Arial, sans-serif;
+}
+
+body {
+  background-color: #1b2430;
+  color: #d6d5a8
+}
+
+div.p-dialog .p-dialog-content {
+  /* background: #1e1e1e; */
+  /* color: rgba(255, 255, 255, 0.87); */
+  padding: .5rem;
+}
