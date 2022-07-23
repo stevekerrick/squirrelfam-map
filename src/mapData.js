@@ -2,65 +2,65 @@ export default {
   locations: [
     {
       name: "Acacia",
-      type: "home",
+      type: "house",
       nether: [-160, 59, -168],
       images: ["acacia01.png", "acacia02.png", "acacia03.png"]
     },
     {
       name: "Jungle",
-      type: "portal",
+      type: "spider",
       nether: [-347, 62, -333],
     },
     {
       name: "Sunflower",
-      type: "portal",
+      type: "sun-plant-wilt",
       nether: [-360, 64, -656],
     },
     {
       name: "Flower Mine",
-      type: "portal",
+      type: "seedling",
       nether: [-611, 62, -339],
     },
     {
       name: "Ice Spikes",
-      type: "portal",
+      type: "icicles",
       nether: [-613, 73, 340],
     },
     {
       name: "Casey's House",
-      type: "home",
+      type: "house",
       nether: [38, 68, -39],
     },
     {
       name: "Michelle's",
-      type: "village",
+      type: "campground",
       nether: [-17, 60, -168],
       images: ["michelle01.png", "michelle02.png", "michelle03.png"]
     },
     {
       name: "Dorginton",
-      type: "village",
+      type: "campground",
       nether: [-299, 90, -234],
     },
     {
       name: "Two Castles",
-      type: "portal",
+      type: "fort-awesome",
       nether: [-160, 59, 953],
     },
     {
       name: "Mansion 1",
-      type: "portal",
+      type: "hotel",
       nether: [1204, 59, 953],
     },
     {
       name: "Stronghold",
-      type: "stronghold",
+      type: "chess-rook",
       nether: [-181, 70, 120],
       images: ["stronghold01.png", "stronghold02.png", "stronghold03.png", "stronghold04.png"]
     },
     {
       name: "Mangrove",
-      type: "point",
+      type: "frog",
       overworld: [-4075, 64, -905]
     }
   ],

@@ -15,7 +15,7 @@
     <div
       v-for="location in locations"
       :key="location.name"
-      :class="{'loc': true, 'highlighted': highlightedLocation === location}"
+      :class="{ loc: true, highlighted: highlightedLocation === location }"
       :style="locStyle(location)"
       @click="onLocationClick(location)"
     >
@@ -275,8 +275,10 @@ export default {
       var top = this.screenY(this.locationY(location));
 
       return {
-        left: `${left - 25}px`,
-        top: `${top - 25}px`
+        // left: `${left - 25}px`,
+        // top: `${top - 25}px`
+        left: `${left - 17}px`,
+        top: `${top - 17}px`
       };
     },
     horizontalPathStyle(path) {
@@ -315,15 +317,8 @@ export default {
     },
 
     locationIcon(type) {
-      return type === "home"
-        ? "fa-solid fa-house"
-        : type === "portal"
-        ? "fa-solid fa-dungeon"
-        : type === "stronghold"
-        ? "fa-solid fa-chess-rook"
-        : type === "village"
-        ? "fa-solid fa-campground"
-        : "fa-solid fa-location-pin";
+      var faGroup = type === "fort-awesome" ? "fa-brands" : "fa-solid";
+      return `${faGroup} fa-${type}`;
     },
     coordinates(location) {
       return `(${this.locationX(location)},, ${this.locationY(location)})`;
