@@ -1,81 +1,44 @@
 <template>
-  <div
-    v-if="isloaded"
-    class="map"
-    :class="grabClass"
-    @wheel="onWheel"
-    @mousedown="onMouseDown"
-    @mouseup="onMouseUp"
-    @mouseenter="onMouseEnter"
-    @mouseleave="onMouseLeave"
-    @mousemove="onMouseMove"
-    v-cloak
-  >
+  <div v-if="isloaded" class="map" :class="grabClass" @wheel="onWheel" @mousedown="onMouseDown" @mouseup="onMouseUp"
+    @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" @mousemove="onMouseMove" v-cloak>
     <!-- Locations -->
-    <div
-      v-for="location in locations"
-      :key="location.name"
-      :class="{ loc: true, highlighted: highlightedLocation === location }"
-      :style="locStyle(location)"
-      @click="onLocationClick(location)"
-    >
+    <div v-for="location in locations" :key="location.name"
+      :class="{ loc: true, highlighted: highlightedLocation === location }" :style="locStyle(location)"
+      @click="onLocationClick(location)">
       <i :class="locationIcon(location.type)"></i>
-      <span v-if="showDetails || highlightedLocation === location"
-        >&nbsp;{{ location.name }}</span
-      >
-      <div
-        v-if="showDetails || highlightedLocation === location"
-        class="coordinates"
-      >
+      <span v-if="showDetails || highlightedLocation === location">&nbsp;{{ location.name }}</span>
+      <div v-if="showDetails || highlightedLocation === location" class="coordinates">
         {{ coordinates(location) }}
       </div>
-      <div
-        v-if="
-          (showDetails || highlightedLocation === location) && location.images
-        "
-      >
+      <div v-if="
+        (showDetails || highlightedLocation === location) && location.images
+      ">
         <a @click="showImages(location, $event)">images</a>
       </div>
     </div>
 
     <!-- Horizontal paths -->
-    <div
-      v-for="(horizontalPath, index) in horizontalPaths"
-      :key="index"
-      class="horizontal-path"
-      :style="horizontalPathStyle(horizontalPath)"
-    >
+    <div v-for="(horizontalPath, index) in horizontalPaths" :key="index" class="horizontal-path"
+      :style="horizontalPathStyle(horizontalPath)">
       <div class="horizontal-path"></div>
     </div>
 
     <!-- Vertical paths -->
-    <div
-      v-for="(verticalPath, index) in verticalPaths"
-      :key="index"
-      class="vertical-path"
-      :style="verticalPathStyle(verticalPath)"
-    >
+    <div v-for="(verticalPath, index) in verticalPaths" :key="index" class="vertical-path"
+      :style="verticalPathStyle(verticalPath)">
       <div class="vertical-path"></div>
     </div>
 
     <template v-for="tick in horizontalTicks" :key="tick.label">
       <div class="horizontal-tick" :style="{ left: `${tick.left}px` }"></div>
-      <div
-        v-if="tick.label"
-        class="horizontal-tick-label"
-        :style="{ left: `calc(${tick.left}px - 2em)` }"
-      >
+      <div v-if="tick.label" class="horizontal-tick-label" :style="{ left: `calc(${tick.left}px - 2em)` }">
         {{ tick.label }}
       </div>
     </template>
 
     <template v-for="tick in verticalTicks" :key="tick.label">
       <div class="vertical-tick" :style="{ top: `${tick.top}px` }"></div>
-      <div
-        v-if="tick.label"
-        class="vertical-tick-label"
-        :style="{ top: `calc(${tick.top}px - .6em)` }"
-      >
+      <div v-if="tick.label" class="vertical-tick-label" :style="{ top: `calc(${tick.top}px - .6em)` }">
         {{ tick.label }}
       </div>
     </template>
@@ -86,12 +49,7 @@
     </div>
 
     <!-- Image carousel -->
-    <Dialog
-      v-model:visible="showDialog"
-      :modal="true"
-      :dismissableMask="true"
-      :showHeader="false"
-    >
+    <Dialog v-model:visible="showDialog" :modal="true" :dismissableMask="true" :showHeader="false">
       <Carousel :value="imageLocation.images">
         <template #item="slotProps">
           <img :src="`images/${slotProps.data}`" />
@@ -244,15 +202,34 @@ export default {
       return loc.overworld ? loc.overworld[0] : loc.nether[0] * 8;
     },
     locationY(loc) {
-      return loc.overworld ? loc.overworld[2] : loc.nether[2] * 8;
+      return loc.overworld ? loc.overworld[1] : loc.nether[1] * 8;
     },
     setNetherPaths() {
+
+      // Draw the nether paths, using the converted path list
       MapData.paths.forEach(p => {
-        for (var i = 2; i < p.length; i += 2) {
-          var x0 = p[i - 2] * 8;
-          var y0 = p[i - 1] * 8;
-          var x1 = p[i] * 8;
-          var y1 = p[i + 1] * 8;
+        // In MapData.paths, there's a mix of (x,y) and location names. Convert the names into coordinates
+        let coords = [];
+        let j = 0;
+        while (j < p.length) {
+          if (typeof p[j] === "number") {
+            coords.push(p[j]);
+          }
+          else {
+            const loc = MapData.locations.find(_ => _.name === p[j]);
+            coords.push(this.locationX(loc) / 8);
+            coords.push(this.locationY(loc) / 8);
+          }
+
+          j++;
+        }
+
+        // Draw all the lines in the path
+        for (var i = 2; i < coords.length; i += 2) {
+          var x0 = coords[i - 2] * 8;
+          var y0 = coords[i - 1] * 8;
+          var x1 = coords[i] * 8;
+          var y1 = coords[i + 1] * 8;
 
           if (x0 === x1) {
             this.verticalPaths.push({
@@ -275,8 +252,6 @@ export default {
       var top = this.screenY(this.locationY(location));
 
       return {
-        // left: `${left - 25}px`,
-        // top: `${top - 25}px`
         left: `${left - 17}px`,
         top: `${top - 17}px`
       };
@@ -415,6 +390,7 @@ export default {
   background-color: #1b2430;
   cursor: pointer;
 }
+
 .loc.highlighted {
   z-index: 20;
 }
@@ -424,9 +400,11 @@ a {
   text-decoration: underline;
   color: rgba(214, 213, 168, 0.8);
 }
+
 a:hover {
   cursor: pointer;
 }
+
 img {
   max-width: 60%;
 }
@@ -449,6 +427,7 @@ img {
   height: 0.5em;
   border-left: 1px solid #51557e;
 }
+
 .horizontal-tick-label {
   position: absolute;
   top: 0.7em;
@@ -457,10 +436,12 @@ img {
   font-size: small;
   color: rgba(214, 213, 168, 0.5);
 }
+
 .vertical-path {
   position: absolute;
   border-left: 2px dashed #51557e;
 }
+
 .vertical-tick {
   position: absolute;
   left: 0;
@@ -468,6 +449,7 @@ img {
   height: 0;
   border-top: 1px solid #51557e;
 }
+
 .vertical-tick-label {
   position: absolute;
   left: 0.9em;
@@ -482,6 +464,7 @@ img {
 .mouse-down {
   cursor: grabbing;
 }
+
 .mouse-position {
   position: absolute;
   font-size: small;
