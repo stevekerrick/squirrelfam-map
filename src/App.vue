@@ -10,9 +10,7 @@
       <div v-if="showDetails || highlightedLocation === location" class="coordinates">
         {{ coordinates(location) }}
       </div>
-      <div v-if="
-        (showDetails || highlightedLocation === location) && location.images
-      ">
+      <div v-if="(showDetails || highlightedLocation === location) && location.images">
         <a @click="showImages(location, $event)">images</a>
       </div>
     </div>
@@ -251,10 +249,15 @@ export default {
       var left = this.screenX(this.locationX(location));
       var top = this.screenY(this.locationY(location));
 
-      return {
+      let styles = {
         left: `${left - 17}px`,
         top: `${top - 17}px`
       };
+      if (location.type === "biohazard"){
+        styles.color = "red";
+      }
+
+      return styles;
     },
     horizontalPathStyle(path) {
       return {

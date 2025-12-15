@@ -2,8 +2,9 @@ export default {
   locations: [
     {
       name: "AC2",
-      type: "house",
-      nether: [-611, -778]
+      type: "biohazard",
+      nether: [-611, -778],
+      color: "red"
     },
     {
       name: "Acacia",
@@ -18,12 +19,12 @@ export default {
     },
     {
       name: "Coal Mine",
-      type: "house",
+      type: "trowel",
       nether: [-587, -740]
     },
     {
       name: "Dale's Vale",
-      type: "house",
+      type: "mountain-sun",
       nether: [-606, 195]
     },
     {
@@ -44,7 +45,7 @@ export default {
     },
     {
       name: "Ice Base/AC6",
-      type: "house",
+      type: "biohazard",
       nether: [-904, -351]
     },
     {
@@ -57,11 +58,11 @@ export default {
       type: "spider",
       nether: [-347, -333],
     },
-    {
-      name: "Library",
-      type: "house",
-      overworld: [-4596, 1702]
-    },
+    // {
+    //   name: "Library",
+    //   type: "house",
+    //   overworld: [-4596, 1702]
+    // },
     {
       name: "Mangrove",
       type: "frog",
@@ -85,7 +86,7 @@ export default {
     },
     {
       name: "Trials 1",
-      type: "house",
+      type: "user-ninja",
       overworld: [-3244, -858]
     },
     {
@@ -95,7 +96,7 @@ export default {
     },
     {
       name: "The Wilde",
-      type: "house",
+      type: "hat-cowboy",
       nether: [2568, 189]
     }
   ],
